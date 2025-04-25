@@ -1,0 +1,11 @@
+apex==0.9.10dev
+axial_positional_embedding==0.3.12
+einops==0.8.1
+gensim==4.3.3
+local_attention==1.11.1
+numpy==1.26.4
+pandas==1.5.3
+setuptools==68.2.2
+#torch==2.6.0
+tqdm==4.67.1
+scanpy==1.11.1
