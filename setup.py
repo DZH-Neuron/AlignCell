@@ -4,7 +4,7 @@ setup(
     name='AlignCell',
     version='0.1.0',
     author="Zihuan Du",
-    packages=find_packages(),  # 自动发现所有包，包括 performer_pytorch
+    packages=find_packages(), 
     install_requires=[
         'torch',
     ],
