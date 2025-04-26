@@ -1,53 +1,52 @@
 import pandas as pd
 
 def split_cell(updated_cell_labels, expression_matrix, group_column, cell_name_column='cell_name', train_ratio=0.8, random_state=42):
-    """
-    按照指定列（如 'cell_types'）进行分组，并将每个组的数据按指定比例划分为训练集和测试集，同时更新基因表达矩阵的训练集和测试集。
+ """
+    Group the data by a specified column (e.g., 'cell_types') and divide each group into a training set and a test set based on a given ratio, while updating the gene expression matrices for the training and test sets.
 
     Args:
-        updated_cell_labels (pd.DataFrame): 包含细胞名称、类型和其它相关信息的数据框。
-        expression_matrix (pd.DataFrame): 基因表达矩阵，行是基因名，列是细胞名。
-        group_column (str): 用于分组的列名，例如 'cell_types'。
-        cell_name_column (str): 用于指定细胞名称的列名，默认是 'cell_name'。
-        train_ratio (float): 训练集占总数据的比例，默认是 0.8。
-        random_state (int): 随机种子，保证每次划分一致，默认是 42。
+        updated_cell_labels (pd.DataFrame): A DataFrame containing cell names, types, and other relevant information.
+        expression_matrix (pd.DataFrame): Gene expression matrix, with genes as rows and cells as columns.
+        group_column (str): The column name used for grouping, e.g., 'cell_types'.
+        cell_name_column (str): The column name used to specify cell names. Default is 'cell_name'.
+        train_ratio (float): The proportion of data allocated to the training set. Default is 0.8.
+        random_state (int): Random seed to ensure reproducibility of the splits. Default is 42.
 
     Returns:
-        train_data (pd.DataFrame): 划分后的训练集。
-        test_data (pd.DataFrame): 划分后的测试集。
-        train_expression_matrix (pd.DataFrame): 划分后的训练集基因表达矩阵。
-        test_expression_matrix (pd.DataFrame): 划分后的测试集基因表达矩阵。
+        train_data (pd.DataFrame): The resulting training set.
+        test_data (pd.DataFrame): The resulting test set.
+        train_expression_matrix (pd.DataFrame): The gene expression matrix for the training set.
+        test_expression_matrix (pd.DataFrame): The gene expression matrix for the test set.
     """
-    # 用于存储训练集和测试集的列表
-    df1_list = []  # 训练集
-    df2_list = []  # 测试集
+    # A list to store the training set and test set.
+    df1_list = []  # Training set
+    df2_list = []  # Test set
 
-    # 按指定列分组
+    # Group by the specified column
     groups = updated_cell_labels.groupby(group_column)
 
-    # 遍历每个组
+    # Iterate through each group
     for name, group in groups:
-        # 打乱组内数据的顺序
+        # Shuffle the data within each group
         shuffled_group = group.sample(frac=1, random_state=random_state)
         
-        # 划分每个组的 80% 和 20%
         split_index = int(len(shuffled_group) * train_ratio)
         group_train = shuffled_group.iloc[:split_index]
         group_test = shuffled_group.iloc[split_index:]
         
-        # 将每个组的训练集和测试集加入到对应的列表
+        # Add the training and test sets of each group to the corresponding lists.
         df1_list.append(group_train)
         df2_list.append(group_test)
 
-    # 合并训练集和测试集
+    # Merge the training set and test set.
     train_data = pd.concat(df1_list, axis=0).reset_index(drop=True)
     test_data = pd.concat(df2_list, axis=0).reset_index(drop=True)
 
-    # 根据划分后的 train_data 和 test_data 获取相应的细胞名称
+    # Get the corresponding cell names from the divided train_data and test_data.
     train_cells = train_data[cell_name_column].tolist()
     test_cells = test_data[cell_name_column].tolist()
 
-    # 使用基因表达矩阵中的细胞名称来提取对应列
+    # Use the cell names from the gene expression matrix to extract the corresponding columns.
     train_expression_matrix = expression_matrix[train_cells]
     test_expression_matrix = expression_matrix[test_cells]
 
