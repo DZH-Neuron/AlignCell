@@ -10,7 +10,7 @@ from data_processing.preprocess import Preprocess_gene
 from torch import nn
 
 def parse_args():
-    """解析命令行参数"""
+    """Parse command-line arguments"""
     parser = argparse.ArgumentParser(description="Train AlignCell Model")
     parser.add_argument('--train_data', type=str, required=True, help="Path to training data")
     parser.add_argument('--w2v_model', type=str, default='./data_processing/hum_dic_gene2vec.model',required=True, help="Path to pre-trained Word2Vec model")
@@ -22,7 +22,7 @@ def parse_args():
     return parser.parse_args()
 
 def load_and_preprocess_data(train_data_path, w2v_model_path, sen_len):
-    """加载并预处理数据"""
+    """Load and preprocess data"""
     print("Loading data...")
     gene_name, gene_label = load_training_data(train_data_path)
     
@@ -34,12 +34,12 @@ def load_and_preprocess_data(train_data_path, w2v_model_path, sen_len):
     return gene_name, gene_label, embedding
 
 def create_model(input_dim, d_model, num_layers, num_heads, d_ff, max_len, dropout, fix_embedding, fast_attention_config):
-    """创建并返回模型"""
+    """Create and return the model"""
     model = TransformerEncoder(input_dim, d_model, num_layers, num_heads, d_ff, max_len, dropout, fix_embedding, fast_attention_config)
     return model
 
 def split_data(gene_name, gene_label, train_size=0.8):
-    """分割数据集"""
+    """Split the dataset"""
     train_size = int(train_size * len(gene_name))
     val_size = len(gene_name) - train_size
 
@@ -52,16 +52,16 @@ def split_data(gene_name, gene_label, train_size=0.8):
     return train_loader, val_loader
 
 def main():
-    # 解析命令行参数
+    # Parse command-line arguments
     args = parse_args()
 
-    # 判断设备
+    # Check the device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 数据加载与预处理
+    # Data loading and preprocessing
     gene_name, gene_label, embedding = load_and_preprocess_data(args.train_data, args.w2v_model, args.sen_len)
 
-    # 模型参数设置
+    # Model parameter settings
     input_dim ,d_model = embedding.size()
     num_layers = 6
     num_heads = 8
@@ -78,14 +78,14 @@ def main():
     }
     fix_embedding = False
 
-    # 创建模型
+    # Create the model
     model = create_model(input_dim, d_model, num_layers, num_heads, d_ff, max_len, dropout, fix_embedding, fast_attention_config)
     model = model.to(device)
 
-    # 数据集划分
+    # Dataset splitting
     train_loader, val_loader = split_data(gene_name, gene_label)
 
-    # 开始训练
+    # Start training
     print("Starting training...")
     training(args.batch_size, args.epoch, args.lr, args.model_dir, train_loader, val_loader, model, device)
 
