@@ -45,10 +45,10 @@ class EncoderLayer(nn.Module):
         k = self.linear_k(x).view(batch_size, seq_len, self.num_heads, self.dim_heads).transpose(1, 2)
         v = self.linear_v(x).view(batch_size, seq_len, self.num_heads, self.dim_heads).transpose(1, 2)
         if output_attentions:
-            # 如果 self.self_attn 返回两个值 (attn_output, attn_weight)
+            # If self.self_attn returns two values (attn_output, attn_weight)
             attn_output, attn_weight = self.self_attn(q, k, v, output_attentions=True)
         else:
-            # 如果 self.self_attn 返回一个值 (attn_output)
+            # If self.self_attn returns one value (attn_output)
             attn_output = self.self_attn(q, k, v, output_attentions=False)
             attn_weight = None  # 不返回 attention 权重
         
@@ -61,13 +61,13 @@ class EncoderLayer(nn.Module):
         x = self.norm2(x)
         
         if output_attentions:
-            return x, attn_weight  # 返回最终输出和注意力权重
+            return x, attn_weight
         else:
             return x
 
 class PositionalEncoding(nn.Module):
     def __init__(self, embedding, d_model, vocab_size, dropout=0):
-        self.vocab_size = embedding.size(0)#来自embedding的参数
+        self.vocab_size = embedding.size(0) #Parameters from the embedding
         self.d_model = embedding.size(1)
         super().__init__()
         self.dropout = nn.Dropout(p=dropout)
@@ -95,9 +95,9 @@ class TransformerEncoder(nn.Module):
         super(TransformerEncoder, self).__init__()
         #input_dim ,d_model = embedding.size()
         #self.embedding = nn.Linear(input_dim, d_model)
-        self.embedding = torch.nn.Embedding(input_dim, d_model)#参数：单词个数，词向量维度，来自于输入
-        self.embedding.weight = torch.nn.Parameter(embedding)#初始化embedding层，让w2v的embedding层输入
-        # 是否将embedding fix住，如果fix_embedding为False，在训练过程中，embedding也会跟着被训练
+        self.embedding = torch.nn.Embedding(input_dim, d_model) #Parameters: number of words, word vector dimension, derived from the input.
+        self.embedding.weight = torch.nn.Parameter(embedding) #Initialize the embedding layer to accept the w2v embedding layer as input.
+        # Whether to fix the embedding. If fix_embedding is False, the embedding will also be trained during the training process.
         self.embedding.weight.requires_grad = False if fix_embedding else True
         self.embedding_dim = embedding.size(1)
         self.pos_encoder = PositionalEncoding(embedding, d_model, max_len)
@@ -108,19 +108,16 @@ class TransformerEncoder(nn.Module):
         src = self.embedding(src)
         src = self.pos_encoder(src)
         
-        attentions = []  # 存储每一层的注意力
+        attentions = [] 
         for layer in self.layers:
-            # 将 output_attentions 传递给每一层
             if output_attentions:
                 src, attn_weight = layer(src, mask, output_attentions=True)
                 attentions.append(attn_weight)
             else:
                 src = layer(src, mask, output_attentions=False)
         
-        # 取出最后一个位置的输出（[CLS] token 或最后一个token的表示）
         src = src[:, 0, :]
         
-        # 如果需要返回注意力权重，则返回输出和注意力列表
         if output_attentions:
             return src, attentions
         else:
