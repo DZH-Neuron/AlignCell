@@ -13,10 +13,10 @@ class Preprocess_gene():
         self.word2idx = {}
         self.embedding_matrix = []
         if w2v_path is None:
-            # 获取当前文件路径（假设当前文件在 AlignCell 目录下）
+            # Get the current file path (assuming the file is located in the AlignCell directory).
             self.base_dir = os.path.dirname(__file__)
             self.w2v_path = os.path.join(self.base_dir, 'hum_dic_gene2vec.model')
-          # 确保路径存在
+          # Ensure that the path exists.
         if not os.path.exists(self.w2v_path):
             raise FileNotFoundError(f"!!!not found：{self.w2v_path}")
     def get_w2v_model(self):
@@ -24,7 +24,7 @@ class Preprocess_gene():
         self.embedding_dim = self.embedding.vector_size
     def add_embedding(self, word):
         vector = torch.empty(1, self.embedding_dim)
-        torch.nn.init.uniform_(vector)# torch.nn.init.uniform_(tensor, a=0, b=1)服从均匀分布U（0,1）
+        torch.nn.init.uniform_(vector)# torch.nn.init.uniform_(tensor, a=0, b=1) initializes the tensor with a uniform distribution U(0, 1).
         self.word2idx[word] = len(self.word2idx)
         self.idx2word.append(word)
         self.embedding_matrix = torch.cat([self.embedding_matrix, vector], 0)
