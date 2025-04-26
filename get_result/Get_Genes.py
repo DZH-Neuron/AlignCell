@@ -10,23 +10,23 @@ def extract_high_attention_genes(
     threshold=0.0015,
     cell_index_column='Unnamed: 0',
     cell_type_column='Type',
-    group_column=None  # 例如 'species' 或 'modality'，可选
+    group_column=None  # For example, 'species' or 'modality', optional.
 ):
     """
-    提取高注意力基因，并计算每个 group-celltype 中的出现次数和平均注意力值。
+    Extract highly attended genes and calculate the occurrence count and average attention value for each group-celltype.
 
-    参数：
+    Args:
         slc_attention: np.ndarray (num_cells, seq_len)
         gene_name: np.ndarray (num_cells, seq_len)
-        preprocess: 具有 idx2word 映射的对象
-        ref_cell_labels: pd.DataFrame，含细胞类型、索引及分组信息
-        threshold: float，注意力筛选阈值
-        cell_index_column: str，细胞索引列名
-        cell_type_column: str，细胞类型列名
-        group_column: str or None，分组列名（如物种或组学），若为 None 则不分组
+        preprocess: An object with idx2word mapping
+        ref_cell_labels: pd.DataFrame containing cell types, indices, and group information
+        threshold: float, attention filtering threshold
+        cell_index_column: str, the column name for cell index
+        cell_type_column: str, the column name for cell type
+        group_column: str or None, the column name for grouping (e.g., species or modality). If None, no grouping is performed.
 
-    返回：
-        pd.DataFrame，列为 ['group', 'celltype', 'gene_symbol', 'count', 'mean_attention'] 或不包含 'group'
+    Returns:
+        pd.DataFrame, with columns ['group', 'celltype', 'gene_symbol', 'count', 'mean_attention'], or without 'group'.
     """
 
     all_gene_indices = []
