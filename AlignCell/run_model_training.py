@@ -5,12 +5,12 @@ from torch.utils.data import random_split
 from AlignCell import TransformerEncoder, PositionalEncoding, EncoderLayer, FeedForward
 
 def create_model(embedding, input_dim, d_model, num_layers, num_heads, d_ff, max_len, dropout, fix_embedding, fast_attention_config):
-    """创建并返回模型"""
+    """Create and return the model"""
     model = TransformerEncoder(embedding, input_dim, d_model, num_layers, num_heads, d_ff, max_len, dropout, fix_embedding, fast_attention_config)
     return model
 
 def split_data(all_dataset, batch_size, size_ratio=0.8):
-    """分割数据集"""
+    """Split the dataset"""
     train_size = int(size_ratio * len(all_dataset))
     val_size = len(all_dataset) - train_size
 
@@ -124,7 +124,7 @@ def run_model_training(
         )
 
     finally:
-        # 释放显存
+        # Release memory
         # del model
         torch.cuda.empty_cache()
         print("Model training finished, GPU memory cleared.")
