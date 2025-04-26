@@ -46,21 +46,19 @@ def training(batch_size, n_epoch, lr, model_dir, train, valid, model, device, ou
             anchor_label, anchor_gene = anchor_label.to(device, dtype=torch.long), anchor_gene.to(device, dtype=torch.long)
             positive_label, positive_gene = positive_label.to(device, dtype=torch.long), positive_gene.to(device, dtype=torch.long)
             negative_label, negative_gene = negative_label.to(device, dtype=torch.long), negative_gene.to(device, dtype=torch.long)
-            optimizer.zero_grad() # 由于loss.backward（）的gradient会累加，所以每次喂完一个batch后需要归零
+            optimizer.zero_grad() 
             
             if output_attentions:
-                # 如果需要输出 attention weights
                 anchor_out, attn_weight_anchor = model(anchor_gene, output_attentions=True)
                 positive_out, attn_weight_positive = model(positive_gene, output_attentions=True)
                 negative_out, attn_weight_negative = model(negative_gene, output_attentions=True)
             else:
-                # 如果不需要输出 attention weights
                 anchor_out = model(anchor_gene)
                 positive_out = model(positive_gene)
                 negative_out = model(negative_gene)
             
             loss = criterion(anchor=anchor_out,positive=positive_out,negative=negative_out)
-            loss.backward() # 算 loss 的 gradient
+            loss.backward()
             optimizer.step()
             loss_record.append(loss.detach().item())
             mean_train_loss = sum(loss_record)/len(loss_record)
@@ -83,12 +81,10 @@ def training(batch_size, n_epoch, lr, model_dir, train, valid, model, device, ou
                 negative_label, negative_gene = negative_label.to(device, dtype=torch.long), negative_gene.to(device, dtype=torch.long)
                 
                 if output_attentions:
-                    # 如果需要输出 attention weights
                     anchor_out, attn_weight_anchor = model(anchor_gene, output_attentions=True)
                     positive_out, attn_weight_positive = model(positive_gene, output_attentions=True)
                     negative_out, attn_weight_negative = model(negative_gene, output_attentions=True)
                 else:
-                    # 如果不需要输出 attention weights
                     anchor_out = model(anchor_gene)
                     positive_out = model(positive_gene)
                     negative_out = model(negative_gene)
@@ -103,10 +99,9 @@ def training(batch_size, n_epoch, lr, model_dir, train, valid, model, device, ou
             #print("Valid | Loss:{:.5f} Acc: {:.3f} ".format(totalv_loss/v_batch, totalv_acc/len(val_dataset)))
             if mean_valid_loss < best_loss:
                 best_loss = mean_valid_loss
-                # 如果validation的结果优于之前所有的结果，就把当下的模型存下来以备之后做预测时使用
                 torch.save(model, "{}/FineTurn_no_mtDNA.model".format(model_dir))
                 print('saving model with loss {:.5f}   <<========='.format(mean_valid_loss))
                 #print('label:',labels.cuda())
                 #print('out:',outputs.float())
         print('-----------------------------------------------')
-        model.train() # 将model的模式设为train，这样optimizer就可以更新model的参数（因为刚刚转成eval模式）
+        model.train() 
