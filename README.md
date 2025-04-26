@@ -4,6 +4,6 @@ A deep learning model designed to integrate sequencing data across platforms, om
 
 ![image](https://github.com/user-attachments/assets/27ec253c-eee0-407a-b197-b25c1737def4)
 
-Developed based on torch 2.6.0, the test folder contains both the pre-trained and trained models, as well as the running script. After downloading the test data and placing it in the test/example folder, it can be executed.
+Developed based on ```torch 2.6.0```, the test folder contains both the pre-trained and trained models, as well as the running script. After downloading the test data and placing it in the ```test/example``` folder, it can be executed.
 
-After downloading, switch to the first AlignCell directory, first run pip install -r requirements to install the dependencies, and then run pip install -e . to complete the installation.
+After downloading, switch to the first AlignCell directory, first run  ```sh pip install -r requirements``` to install the dependencies, and then run ```sh pip install -e .``` to complete the installation.
