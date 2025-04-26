@@ -8,4 +8,4 @@ Developed based on ```torch 2.6.0```, the test folder contains both the pre-trai
 
 After downloading, switch to the first AlignCell directory, first run  ```sh pip install -r requirements``` to install the dependencies, and then run ```sh pip install -e .``` to complete the installation.
 
-The data for ```test/example``` can be obtained from ```https://zenodo.org/uploads/15285426```.
+The data for ```test/example``` can be obtained from ``` https://doi.org/10.5281/zenodo.15285426```.
