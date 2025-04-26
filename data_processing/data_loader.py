@@ -3,19 +3,18 @@ import pandas as pd
 class DataLoader:
     def __init__(self, expression_matrix_1, cell_labels_1, expression_matrix_2=None, cell_labels_2=None, top_genes=1000, mode="target", cell_name_column='cell_name', cell_type_column='cell_type'):
         """
-        初始化数据加载器，支持处理一个或两个数据集。
-
-        Args:
-            expression_matrix_1 (pd.DataFrame): 第一个基因表达矩阵，行是基因名，列是细胞名。
-            cell_labels_1 (pd.DataFrame): 第一个细胞标签，包含列用于指定细胞名称和标签。
-            expression_matrix_2 (pd.DataFrame, optional): 第二个基因表达矩阵，行是基因名，列是细胞名。默认为 None。
-            cell_labels_2 (pd.DataFrame, optional): 第二个细胞标签，包含列用于指定细胞名称和标签。默认为 None。
-            top_genes (int): 每个细胞提取的高表达基因数目。
-            mode (str): 当前数据模式，支持 'target', 'query', 或 'train'。
-            cell_name_column (str): 用于匹配细胞名称的列名，默认是 'cell_name'。
-            cell_type_column (str): 用于匹配细胞类型的列名，默认是 'cell_type'。
+        Initialize the data loader, supporting the processing of one or two datasets.
+            Args:
+                expression_matrix_1 (pd.DataFrame): The first gene expression matrix, with genes as rows and cells as columns.
+                cell_labels_1 (pd.DataFrame): Cell labels for the first dataset, including columns specifying cell names and cell types.
+                expression_matrix_2 (pd.DataFrame, optional): The second gene expression matrix, with genes as rows and cells as columns. Default is None.
+                cell_labels_2 (pd.DataFrame, optional): Cell labels for the second dataset, including columns specifying cell names and cell types. Default is None.
+                top_genes (int): The number of highly expressed genes to extract for each cell.
+                mode (str): The current data mode, supporting 'target', 'query', or 'train'.
+                cell_name_column (str): The column name used to match cell names. Default is 'cell_name'.
+                cell_type_column (str): The column name used to match cell types. Default is 'cell_type'.
         """
-        # 检查输入数据格式
+        # Check the input data format.
         if not isinstance(expression_matrix_1, pd.DataFrame):
             raise TypeError("expression_matrix_1 should be a pandas DataFrame.")
         if not isinstance(cell_labels_1, pd.DataFrame):
@@ -40,13 +39,13 @@ class DataLoader:
 
     def process_data(self):
         """
-        处理基因表达矩阵和细胞标签，提取高表达基因，并更新细胞标签。
+        Process gene expression matrices and cell labels, extract highly expressed genes, and update cell labels.
 
-        Returns:
-            y (list): 每个细胞的高表达基因列表。
-            z (list): 唯一的细胞 ID 列表，格式为 [[mode, number], ...]。
-            updated_cell_labels_1 (pd.DataFrame): 更新后的第一个数据集细胞标签。
-            updated_cell_labels_2 (pd.DataFrame, optional): 更新后的第二个数据集细胞标签，如果存在。
+            Returns:
+                y (list): A list of highly expressed genes for each cell.
+                z (list): A list of unique cell IDs, formatted as [[mode, number], ...].
+                updated_cell_labels_1 (pd.DataFrame): Updated cell labels for the first dataset.
+                updated_cell_labels_2 (pd.DataFrame, optional): Updated cell labels for the second dataset, if provided.
         """
         if self.expression_matrix_2 is not None and self.cell_labels_2 is not None:
             return self._process_two_datasets()
@@ -55,30 +54,28 @@ class DataLoader:
 
     def _process_single_dataset(self):
         """
-        处理单个数据集。
+        Process a single dataset.
         """
         common_cells = self.expression_matrix_1.columns.intersection(self.cell_labels_1[self.cell_name_column])
         if len(common_cells) == 0:
             raise ValueError(f"No matching cells between expression_matrix_1 and cell_labels_1 using column '{self.cell_name_column}'.")
         
-        # 提取非 MT^ 开头的基因
         filtered_matrix = self.expression_matrix_1.loc[~self.expression_matrix_1.index.str.startswith("MT^")]
         
-        # 获取每个细胞的高表达基因
         y = []
         for cell in common_cells:
             top_genes = filtered_matrix[cell].sort_values(ascending=False).head(self.top_genes)
             y.append(top_genes.index.tolist())
         
-        # 为每个细胞生成唯一 ID (数字_数字的形式)，并将其转换为 [mode, number] 格式
+        # Generate a unique ID for each cell in the format of number_number, and convert it into [mode, number] format.
         z = [[self.mode, i+1] for i in range(len(common_cells))]
         
-        # 更新 cell_labels 数据
+        # Update the cell_labels data.
         updated_cell_labels = self.cell_labels_1[self.cell_labels_1[self.cell_name_column].isin(common_cells)].copy()
         updated_cell_labels["cell_id"] = [f"{self.mode}_{i+1}" for i in range(len(common_cells))]
         updated_cell_labels["mode"] = self.mode_str
         
-        # 如果是 train 模式，添加 target 和 cell_type 编码
+        # If in 'train' mode, add target and cell type encoding.
         if self.mode_str == "train":
             if self.cell_type_column not in updated_cell_labels.columns:
                 updated_cell_labels[self.cell_type_column] = ''
@@ -90,9 +87,8 @@ class DataLoader:
 
     def _process_two_datasets(self):
         """
-        处理两个数据集，并返回更新后的标签和编码。
+        Process two datasets and return the updated labels and encodings.
         """
-        # 获取两个数据集的 cell_type 列并计算并集
         all_cell_types = pd.concat([self.cell_labels_1[self.cell_type_column], self.cell_labels_2[self.cell_type_column]]).unique()
         type_mapping = {cell_type: f"3_{i}" for i, cell_type in enumerate(sorted(all_cell_types))}
 
