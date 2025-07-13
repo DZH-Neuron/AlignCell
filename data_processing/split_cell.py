@@ -1,7 +1,7 @@
 import pandas as pd
 
 def split_cell(updated_cell_labels, expression_matrix, group_column, cell_name_column='cell_name', train_ratio=0.8, random_state=42):
- """
+    """
     Group the data by a specified column (e.g., 'cell_types') and divide each group into a training set and a test set based on a given ratio, while updating the gene expression matrices for the training and test sets.
 
     Args:
