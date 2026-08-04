@@ -9,3 +9,13 @@ Developed based on ```torch 2.6.0```, the test folder contains both the pre-trai
 After downloading, navigate to the root directory of AlignCell. You can first create a new environment using  ```conda create -n AlignCell_env -f environment.yaml``` and then activate it with ```conda activate AlignCell_env```. These steps can also be performed with `mamba` as a faster alternative if it is installed. Next, run  ```sh pip install -r requirements.txt``` to install the dependencies, and then run ```sh pip install -e .``` to complete the installation.
 
 The data for ```test/example``` can be obtained from ``` https://doi.org/10.5281/zenodo.15285426```.
+
+
+## Citation
+
+If you use this resource, please cite:
+
+Du Z, Zhang X, Zhang Q, Li J, Cao Z, Gao G, Lin T, Wang D, Gao S.  
+**Multisource omic alignment and biological feature discovery with Performer encoder and triplet networks.**  
+*Genome Research*. 2026 Jul 22.  
+doi: [10.1101/gr.281629.125](https://doi.org/10.1101/gr.281629.125)
